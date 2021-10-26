@@ -20,6 +20,6 @@ jobs:
       - name: build the image
         run: |
           docker buildx build --push \
-            --tag ${{ secrets.DOCKER_REPO_NAME }}:latest \
+            --tag ${{ secrets.DOCKER_REPO }}:latest \
             --platform linux/amd64,linux/arm64 .
 
