@@ -75,7 +75,7 @@ func main() {
 
 	// Init Prometheus Gauge Vectors
 	rConf.balances = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "fuckyou",
+		Namespace: "crypto",
 		Name:      "balance",
 		Help:      fmt.Sprintf("Balance in account for assets"),
 	},
