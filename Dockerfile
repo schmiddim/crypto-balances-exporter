@@ -23,6 +23,6 @@ RUN go build -o /go/bin/main
 ############################
 FROM scratch
 # Copy our static executable.
-COPY --from=builder /go/bin/hello /go/bin/hello
+COPY --from=builder /go/bin/main /go/bin/main
 # Run the hello binary.
 ENTRYPOINT ["/go/bin/main"]
