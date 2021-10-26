@@ -1,0 +1,5 @@
+coins:
+  - name: ETH
+    amount: 100.039996
+  - name: BTC
+    amount: 53.8071
