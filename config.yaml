@@ -3,3 +3,4 @@ coins:
     amount: 100.039996
   - name: BTC
     amount: 53.8071
+    totalCost: 100 #optional

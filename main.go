@@ -11,7 +11,8 @@ import (
 
 type runtimeConfStruct struct {
 	registry       *prometheus.Registry
-	balances       *prometheus.GaugeVec
+	amounts        *prometheus.GaugeVec
+	totalCosts     *prometheus.GaugeVec
 	httpServerPort uint
 	httpServ       *http.Server
 	updateInterval time.Duration
@@ -25,7 +26,8 @@ var rConf = runtimeConfStruct{
 	httpServ:       nil,
 	registry:       prometheus.NewRegistry(),
 	updateInterval: 50,
-	balances:       nil,
+	amounts:        nil,
+	totalCosts:     nil,
 	configFile:     "",
 }
 
@@ -51,16 +53,20 @@ func main() {
 
 	coins = loadYaml(rConf.configFile, coins)
 
-
 	// Init Prometheus Gauge Vectors
-	rConf.balances = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "crypto",
-		Name:      "balance",
+
+	rConf.amounts = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "crypto_balances",
+		Name:      "amount",
 		Help:      fmt.Sprintf("Balance in account for assets"),
-	},
-		[]string{"symbol"},
-	)
-	rConf.registry.MustRegister(rConf.balances)
+	}, []string{"symbol"})
+	rConf.totalCosts = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "crypto_balances",
+		Name:      "total_costs",
+		Help:      fmt.Sprintf("total costs for the coins"),
+	}, []string{"symbol"})
+	rConf.registry.MustRegister(rConf.amounts)
+	rConf.registry.MustRegister(rConf.totalCosts)
 
 	// Regular loop operations below
 	ticker := time.NewTicker(rConf.updateInterval)
@@ -68,8 +74,8 @@ func main() {
 		log.Debug("> Updating....\n")
 
 		for _, item := range coins.Coins {
-			rConf.balances.WithLabelValues(item.Name).Set(item.Amount)
-
+			rConf.amounts.WithLabelValues(item.Name).Set(item.Amount)
+			rConf.totalCosts.WithLabelValues(item.Name).Set(item.TotalCost)
 		}
 		<-ticker.C
 	}

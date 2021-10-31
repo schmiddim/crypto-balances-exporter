@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Name   string  `yaml:"name"`
 	Amount float64 `yaml:"amount"`
+	TotalCost float64 `yaml:"totalCost"`
 }
 
 type Coins struct {
