@@ -53,7 +53,7 @@ func main() {
 	// Init Prometheus Gauge Vectors
 
 	gaugeNames := []string{
-		"amount", "total_costs", "get_rid_off",
+		"amount", "total_costs", "get_rid_of",
 	}
 	for _, name := range gaugeNames {
 		rConf.vectors[name] = prometheus.NewGaugeVec(prometheus.GaugeOpts{
