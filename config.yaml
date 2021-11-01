@@ -1,3 +1,11 @@
+coins_to_get_want_to_get_rid_of:
+  - ogn
+  - enj
+  - lto
+  - inj
+  - xch
+  - vet
+  - grt
 coins:
   - name: ETH
     amount: 100.039996

@@ -11,8 +11,7 @@ import (
 
 type runtimeConfStruct struct {
 	registry       *prometheus.Registry
-	amounts        *prometheus.GaugeVec
-	totalCosts     *prometheus.GaugeVec
+	vectors        map[string]*prometheus.GaugeVec
 	httpServerPort uint
 	httpServ       *http.Server
 	updateInterval time.Duration
@@ -21,13 +20,11 @@ type runtimeConfStruct struct {
 }
 
 var rConf = runtimeConfStruct{
-
 	httpServerPort: 9101,
 	httpServ:       nil,
+	vectors:        make(map[string]*prometheus.GaugeVec),
 	registry:       prometheus.NewRegistry(),
 	updateInterval: 50,
-	amounts:        nil,
-	totalCosts:     nil,
 	configFile:     "",
 }
 
@@ -49,33 +46,37 @@ func initParams() {
 func main() {
 	initParams()
 	setupWebserver()
-	var coins Coins
 
-	coins = loadYaml(rConf.configFile, coins)
+	coins := loadYamlForPortfolio(rConf.configFile)
+	coinsToGetRidOf := loadYamlForGetRidOf(rConf.configFile)
 
 	// Init Prometheus Gauge Vectors
 
-	rConf.amounts = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "crypto_balances",
-		Name:      "amount",
-		Help:      fmt.Sprintf("Balance in account for assets"),
-	}, []string{"symbol"})
-	rConf.totalCosts = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "crypto_balances",
-		Name:      "total_costs",
-		Help:      fmt.Sprintf("total costs for the coins"),
-	}, []string{"symbol"})
-	rConf.registry.MustRegister(rConf.amounts)
-	rConf.registry.MustRegister(rConf.totalCosts)
+	gaugeNames := []string{
+		"amount", "total_costs", "get_rid_off",
+	}
+	for _, name := range gaugeNames {
+		rConf.vectors[name] = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: "crypto_balances",
+			Name:      name,
+			Help:      fmt.Sprintf(name),
+		}, []string{"symbol"})
+		rConf.registry.MustRegister(rConf.vectors[name])
+	}
 
 	// Regular loop operations below
 	ticker := time.NewTicker(rConf.updateInterval)
 	for {
 		log.Debug("> Updating....\n")
 
+		for _, item := range coinsToGetRidOf.Coin {
+			rConf.vectors["get_rid_off"].WithLabelValues(item).Set(1)
+
+		}
 		for _, item := range coins.Coins {
-			rConf.amounts.WithLabelValues(item.Name).Set(item.Amount)
-			rConf.totalCosts.WithLabelValues(item.Name).Set(item.TotalCost)
+			rConf.vectors["amount"].WithLabelValues(item.Name).Set(item.Amount)
+			rConf.vectors["total_costs"].WithLabelValues(item.Name).Set(item.TotalCost)
+
 		}
 		<-ticker.C
 	}
