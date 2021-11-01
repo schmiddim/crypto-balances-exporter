@@ -70,7 +70,7 @@ func main() {
 		log.Debug("> Updating....\n")
 
 		for _, item := range coinsToGetRidOf.Coin {
-			rConf.vectors["get_rid_off"].WithLabelValues(item).Set(1)
+			rConf.vectors["get_rid_of"].WithLabelValues(item).Set(1)
 
 		}
 		for _, item := range coins.Coins {
