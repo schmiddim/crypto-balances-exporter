@@ -13,7 +13,7 @@ type Coin struct {
 }
 
 type CoinsToGetRidOf struct {
-	Coin []string `yaml:"coins_to_get_want_to_get_rid_of"`
+	Coin []string `yaml:"coins_to_get_rid_of"`
 }
 
 type Coins struct {
